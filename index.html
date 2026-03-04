@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIA Kasir — Sistem Informasi Akuntansi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #13161e;
+      --border: #1f2433;
+      --accent: #00e5a0;
+      --accent2: #ff6b35;
+      --text: #e8eaf0;
+      --muted: #6b7385;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* GRID BG */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(13,15,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      min-height: 90vh;
+      padding: 5rem 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 2px;
+      background: var(--accent);
+    }
+    .hero h1 {
+      font-family: var(--sans);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+    }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      padding: 0.75rem 1.75rem;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+    }
+    .btn-primary:hover { background: #00ffb2; transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* KASIR MOCKUP */
+    .kasir-mockup {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      position: relative;
+      animation: floatUp 6s ease-in-out infinite;
+    }
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .mockup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-dots { display: flex; gap: 6px; }
+    .mockup-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .mockup-dots span:nth-child(1) { background: #ff5f57; }
+    .mockup-dots span:nth-child(2) { background: #ffbd2e; }
+    .mockup-dots span:nth-child(3) { background: #28ca41; }
+    .mockup-title { color: var(--muted); font-size: 0.7rem; }
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+    .item-row .qty { color: var(--muted); margin: 0 1rem; }
+    .item-row .price { color: var(--accent); }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 0 0;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-top: 0.5rem;
+    }
+    .total-row .amount { color: var(--accent); font-size: 1rem; }
+    .mockup-badge {
+      position: absolute;
+      top: -12px; right: 20px;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .pay-btn {
+      width: 100%;
+      margin-top: 1.2rem;
+      padding: 0.8rem;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .stat-item {
+      padding: 2rem 2.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* FITUR SECTION */
+    .section {
+      position: relative; z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 2.5rem;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 3.5rem;
+      line-height: 1.1;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: border-color 0.25s, transform 0.25s;
+      cursor: default;
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    .feature-card p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ALUR */
+    .flow-section {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 5rem 2.5rem;
+    }
+    .flow-inner { max-width: 1200px; margin: 0 auto; }
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin-top: 3rem;
+      position: relative;
+    }
+    .flow-steps::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 0.5rem;
+    }
+    .step-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+    .flow-step:nth-child(3) .step-num,
+    .flow-step:nth-child(5) .step-num { border-color: var(--accent2); color: var(--accent2); }
+    .flow-step h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .flow-step p { font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+
+    /* LAPORAN */
+    .report-section {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 5rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .report-text h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+    .report-text p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .report-list { list-style: none; margin-bottom: 2rem; }
+    .report-list li {
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .report-list li::before {
+      content: '→';
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+    .chart-mock {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .chart-mock-title {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 120px;
+    }
+    .bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: var(--accent);
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      animation: growBar 1.2s ease-out forwards;
+    }
+    .bar:hover { opacity: 1; }
+    @keyframes growBar {
+      from { height: 0 !important; }
+    }
+    .bar:nth-child(2) { background: var(--accent2); }
+    .bar:nth-child(4) { background: var(--accent2); opacity: 0.5; }
+    .bar-labels {
+      display: flex;
+      gap: 10px;
+      margin-top: 0.5rem;
+    }
+    .bar-label {
+      flex: 1;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+    .summary-chips {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: rgba(0,229,160,0.08);
+      border: 1px solid rgba(0,229,160,0.2);
+      border-radius: 4px;
+      padding: 0.35rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+    .chip.orange {
+      background: rgba(255,107,53,0.08);
+      border-color: rgba(255,107,53,0.2);
+      color: var(--accent2);
+    }
+
+    /* TEAM */
+    .team-section {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 5rem 2.5rem;
+    }
+    .team-inner { max-width: 1200px; margin: 0 auto; }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .team-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .team-card h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .team-card span {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer span {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    footer span b { color: var(--accent); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem; min-height: auto; }
+      .kasir-mockup { display: none; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .flow-steps { grid-template-columns: 1fr; }
+      .flow-steps::before { display: none; }
+      .report-section { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* SCROLL ANIMATION */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">⬡ SIA — Kasir Otomatis</div>
+    <div class="nav-links">
+      <a href="#fitur">Fitur</a>
+      <a href="#alur">Alur Sistem</a>
+      <a href="#laporan">Laporan</a>
+      <a href="#tim">Tim</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-tag">Sistem Informasi Akuntansi</div>
+      <h1>Otomatisasi<br/><span>Sistem Kasir</span><br/>Modern</h1>
+      <p>Solusi pencatatan transaksi, manajemen stok, dan pelaporan keuangan real-time yang terintegrasi untuk bisnis retail.</p>
+      <div class="btn-group">
+        <a href="#alur" class="btn btn-primary">Lihat Alur Sistem</a>
+        <a href="#laporan" class="btn btn-outline">Laporan Keuangan</a>
+      </div>
+    </div>
+    <div class="kasir-mockup">
+      <div class="mockup-badge">Live</div>
+      <div class="mockup-header">
+        <div class="mockup-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="mockup-title">kasir.sia / transaksi #2847</div>
+      </div>
+      <div class="item-row">
+        <span>Indomie Goreng</span>
+        <span class="qty">x3</span>
+        <span class="price">Rp 9.000</span>
+      </div>
+      <div class="item-row">
+        <span>Aqua 600ml</span>
+        <span class="qty">x2</span>
+        <span class="price">Rp 8.000</span>
+      </div>
+      <div class="item-row">
+        <span>Chitato 68gr</span>
+        <span class="qty">x1</span>
+        <span class="price">Rp 14.000</span>
+      </div>
+      <div class="item-row">
+        <span>Teh Botol Sosro</span>
+        <span class="qty">x4</span>
+        <span class="price">Rp 20.000</span>
+      </div>
+      <div class="total-row">
+        <span>TOTAL</span>
+        <span class="amount">Rp 51.000</span>
+      </div>
+      <button class="pay-btn">PROSES PEMBAYARAN →</button>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar reveal">
+    <div class="stat-item">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Otomatis & Real-time</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">3 det</span>
+      <span class="stat-label">Waktu proses transaksi</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">5 lap</span>
+      <span class="stat-label">Jenis laporan keuangan</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">0 err</span>
+      <span class="stat-label">Human error tercegah</span>
+    </div>
+  </div>
+
+  <!-- FITUR -->
+  <section class="section reveal" id="fitur">
+    <div class="section-label">// Modul Sistem</div>
+    <div class="section-title">Fitur Utama<br/>Sistem Kasir</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🧾</span>
+        <h3>Pencatatan Transaksi</h3>
+        <p>Input transaksi penjualan secara otomatis dengan barcode scanner atau pencarian manual. Struk digital langsung tercetak.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📦</span>
+        <h3>Manajemen Stok</h3>
+        <p>Stok berkurang otomatis setiap transaksi. Notifikasi reorder point saat barang hampir habis.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💰</span>
+        <h3>Jurnal Akuntansi</h3>
+        <p>Pencatatan jurnal umum, buku besar, dan neraca saldo terbentuk otomatis dari setiap transaksi kasir.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3>Laporan Keuangan</h3>
+        <p>Generate laporan laba rugi, neraca, dan arus kas hanya dengan satu klik. Export ke PDF dan Excel.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👥</span>
+        <h3>Multi Kasir</h3>
+        <p>Mendukung beberapa kasir sekaligus dengan sistem login terpisah dan audit trail lengkap per pengguna.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>Keamanan Data</h3>
+        <p>Data transaksi terenkripsi dan tersimpan aman. Backup otomatis harian mencegah kehilangan data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALUR SISTEM -->
+  <section class="flow-section reveal" id="alur">
+    <div class="flow-inner">
+      <div class="section-label">// Business Process</div>
+      <div class="section-title">Alur Sistem<br/>Otomatisasi Kasir</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-num">01</div>
+          <h4>Input Barang</h4>
+          <p>Kasir scan barcode atau pilih produk dari daftar</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">02</div>
+          <h4>Hitung Otomatis</h4>
+          <p>Sistem kalkulasi subtotal, diskon, dan pajak</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">03</div>
+          <h4>Proses Bayar</h4>
+          <p>Konfirmasi pembayaran tunai atau non-tunai</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">04</div>
+          <h4>Update Stok</h4>
+          <p>Inventori berkurang otomatis real-time</p>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">05</div>
+          <h4>Jurnal & Laporan</h4>
+          <p>Pencatatan akuntansi terbentuk otomatis</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAPORAN -->
+  <section class="report-section reveal" id="laporan">
+    <div class="report-text">
+      <div class="section-label">// Akuntansi & Pelaporan</div>
+      <h2>Laporan Keuangan<br/>Otomatis & Akurat</h2>
+      <p>Tidak perlu input manual ke spreadsheet. Semua transaksi kasir langsung menghasilkan laporan keuangan standar akuntansi.</p>
+      <ul class="report-list">
+        <li>Jurnal Umum & Buku Besar</li>
+        <li>Neraca Saldo (Trial Balance)</li>
+        <li>Laporan Laba Rugi</li>
+        <li>Neraca (Balance Sheet)</li>
+        <li>Laporan Arus Kas</li>
+      </ul>
+      <a href="#" class="btn btn-primary">Demo Laporan</a>
+    </div>
+    <div>
+      <div class="chart-mock">
+        <div class="chart-mock-title">Pendapatan Mingguan — Rp</div>
+        <div class="bars">
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:80%"></div>
+          <div class="bar" style="height:65%"></div>
+          <div class="bar" style="height:90%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar" style="height:100%"></div>
+          <div class="bar" style="height:85%"></div>
+        </div>
+        <div class="bar-labels">
+          <span class="bar-label">Sen</span>
+          <span class="bar-label">Sel</span>
+          <span class="bar-label">Rab</span>
+          <span class="bar-label">Kam</span>
+          <span class="bar-label">Jum</span>
+          <span class="bar-label">Sab</span>
+          <span class="bar-label">Min</span>
+        </div>
+        <div class="summary-chips">
+          <span class="chip">↑ +12.4% MoM</span>
+          <span class="chip">Total: Rp 4.2jt</span>
+          <span class="chip orange">HPP: Rp 2.8jt</span>
+          <span class="chip">Laba: Rp 1.4jt</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIM -->
+  <section class="team-section reveal" id="tim">
+    <div class="team-inner">
+      <div class="section-label">// Pengembang Sistem</div>
+      <div class="section-title">Tim Proyek</div>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="avatar">👩‍💻</div>
+          <h4>Nama Anggota 1</h4>
+          <span>System Analyst</span>
+        </div>
+        <div class="team-card">
+          <div class="avatar">👨‍💼</div>
+          <h4>Nama Anggota 2</h4>
+          <span>Database Designer</span>
+        </div>
+        <div class="team-card">
+          <div class="avatar">👩‍🎨</div>
+          <h4>Nama Anggota 3</h4>
+          <span>UI/UX Designer</span>
+        </div>
+        <div class="team-card">
+          <div class="avatar">👨‍🔬</div>
+          <h4>Nama Anggota 4</h4>
+          <span>Accounting Lead</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2025 — <b>SIA Kasir Otomatis</b> — Sistem Informasi Akuntansi</span>
+    <span>Universitas · Mata Kuliah SIA</span>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
